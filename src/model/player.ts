@@ -3,11 +3,9 @@ import Role from "./role";
 import User from "./user";
 
 export default class Player{
-  user: User;
   role: Role;
   status: PlayerStatus;
-  constructor(_user: User, _role: Role, _status = new PlayerStatusAlive()){
-    this.user = _user;
+  constructor( readonly user: User, _role: Role, _status = new PlayerStatusAlive()){
     this.role = _role;
     this.status = _status;
   }

@@ -1,8 +1,12 @@
+import Guid from "./guid";
+
 export default class User{
-  id: number;
+  readonly id: Guid;
   userName: string;
-  constructor(_id: number, _userName: string){
-    this.id = _id;
+  avatarId: number;
+  constructor(_userName: string, _avatarId: number){
+    this.id = new Guid();
     this.userName = _userName;
+    this.avatarId = _avatarId;
   }
 }

@@ -3,14 +3,14 @@ export default abstract class PlayerStatus {
 } 
 
 export class PlayerStatusAlive implements PlayerStatus {
-  print() { return "Alive!" };
+  print() { return "Alive" };
 }
-export class PlayerStatusLynched implements PlayerStatus {
-  print() { return "Lynched!" };
+export class PlayerStatusInjured implements PlayerStatus {
+  print() { return "Injured" };
 }
-export class PlayerStatusKilled implements PlayerStatus {
-  print() { return "Killed!" };
+export class PlayerStatusDead implements PlayerStatus {
+  print() { return "Dead" };
 }
 export class PlayerStatusUnknown implements PlayerStatus {
-  print() { return "Unknown?!" };
+  print() { return "Unknown" };
 }
