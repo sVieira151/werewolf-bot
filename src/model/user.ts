@@ -1,4 +1,4 @@
-import Guid from "./guid";
+import Guid from "./guid.js";
 
 export default class User{
   readonly id: Guid;

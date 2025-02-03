@@ -1,4 +1,4 @@
-import Guid from "./guid";
+import Guid from "./guid.js";
 
 export default abstract class Phase {
   readonly id: Guid;  

@@ -2,6 +2,7 @@ import { Collection } from "discord.js";
 import fs from "fs";
 import url from "url";
 import path from "path";
+import Command from "./command.js";
 
 export async function loadCommandsFromFile() {
   // we could use __dirname but doing it long hand in case we 
@@ -10,7 +11,7 @@ export async function loadCommandsFromFile() {
   const foldersPath = path.dirname(filename);
   const commandFolders = fs.readdirSync(foldersPath);
 
-  let commands = new Collection();
+  const commands = new Collection<string, Command>();
   for (const folder of commandFolders) {
     const commandsPath = path.join(foldersPath, folder);
     if (!fs.existsSync(commandsPath) || !fs.lstatSync(commandsPath).isDirectory()) continue;

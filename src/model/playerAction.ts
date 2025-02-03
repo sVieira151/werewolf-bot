@@ -1,7 +1,7 @@
-import PlayerActionStatus, { PlayerActionStatusNone, PlayerActionStatusSuccess, PlayerActionStatusUndone } from "./playerActionStatus";
-import Guid from "./guid";
-import Player from "./player";
-import Phase from "./phase";
+import PlayerActionStatus, { PlayerActionStatusNone, PlayerActionStatusSuccess, PlayerActionStatusUndone } from "./playerActionStatus.js";
+import Guid from "./guid.js";
+import Player from "./player.js";
+import Phase from "./phase.js";
 
 export default abstract class PlayerAction{
   readonly id: Guid;

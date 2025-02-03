@@ -1,6 +1,6 @@
-import PlayerStatus, { PlayerStatusAlive } from "./playerStatus";
-import Role from "./role";
-import User from "./user";
+import PlayerStatus, { PlayerStatusAlive } from "./playerStatus.js";
+import Role from "./role.js";
+import User from "./user.js";
 
 export default class Player{
   role: Role;
