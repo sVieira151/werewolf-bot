@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Client, Events, GatewayIntentBits, MessageFlags } from "discord.js";
 import { loadCommandsFromFile } from "./commands/loader.js";
 import DiscordClientOptions from "./discordClientOptions.js";
