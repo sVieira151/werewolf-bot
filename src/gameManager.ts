@@ -4,42 +4,44 @@ import Game from "./model/game.js";
 import HostQueue from "./model/hostQueue.js";
 
 const FILENAME = "gameManager.json";
-const GAME_FILENAME = (game: string) => `${game}.json`;
+//const GAME_FILENAME = (game: string) => `${game}.json`;
 
 export default class GameManager {   
   hosts: HostQueue;
   currentGames: Game[];
-  private readonly dataPath: string;
-  private readonly filePath: string;
+  private static dataPath: string;
+  private static filePath: string;
   
-  private constructor(dataPath: string){
-    this.dataPath = dataPath;
-    this.filePath = path.join(this.dataPath, FILENAME);
+  private constructor(){
     this.hosts = new HostQueue();
     this.currentGames = [];
   }
 
-  static Load(dataPath: string): GameManager{
-    var result: GameManager = new GameManager(dataPath);
-    result.read();
-    return result;
+  static setDataPath(_dataPath: string){
+    GameManager.dataPath = _dataPath;
+    GameManager.filePath = path.join(this.dataPath, FILENAME);
   }
 
-  Unload(){
-    // in this case all we need to do is write to file
-    this.write();    
+  static get(): GameManager{
+    if (!GameManager.dataPath)
+      throw Error("Must call setDataPath() before Get().");
+
+    const gm = new GameManager();
+    gm.import();
+    return gm;
   }
 
-  private read(){
-    if (!fs.existsSync(this.filePath)){
-      fs.writeFileSync(this.filePath, JSON.stringify(this));
+  import(){
+    if (!fs.existsSync(GameManager.filePath)){
+      this.export();
       return;
     }
-    let jsonData = JSON.parse(fs.readFileSync(this.filePath, 'utf8'));
-    console.log(jsonData);
+    const jsonData = JSON.parse(fs.readFileSync(GameManager.filePath, 'utf8'));
+    this.hosts = jsonData.hosts;
+    this.currentGames = jsonData.currentGames;
   }
 
-  private write(){    
-    fs.writeFileSync(this.filePath, JSON.stringify(this));
+  export(){
+    fs.writeFileSync(GameManager.filePath, JSON.stringify(this, null, '\t'));
   }
 }
