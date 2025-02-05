@@ -1,9 +1,9 @@
 import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
 import { setTimeout as wait } from 'node:timers/promises';
+import Command from "../command.js";
 
 function buildInfoEmbed(interaction){
   const { client, guild } = interaction;
-  console.log(client);
   return new EmbedBuilder()
     .setColor(0x00FF99)
     .setTitle(`About`)
@@ -19,15 +19,20 @@ function buildInfoEmbed(interaction){
     );
 }
 
-export const command = {
-	data: new SlashCommandBuilder()
-		.setName('about')
-		.setDescription('Provides information about the bot.'),
-	async execute(interaction) {
+class AboutCommand implements Command{
+  data: SlashCommandBuilder;
+  constructor(){
+    this.data = new SlashCommandBuilder()
+		  .setName('about')
+		  .setDescription('Provides information about the bot.');
+  }	
+  async execute(interaction) {
     await interaction.deferReply();
     await wait(2_000);
 		await interaction.editReply(`You think I'll give *you* that kind of information?!`);
     await wait(4_000);
     await interaction.followUp({content: `Ugh, fine...`, embeds: [buildInfoEmbed(interaction)]})
-	},
-};
+  }
+}
+
+export const command = new AboutCommand();

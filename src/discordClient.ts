@@ -1,8 +1,14 @@
-import { Client, Events, SlashCommandBuilder, GatewayIntentBits, Collection } from "discord.js";
+import { Client, Events, GatewayIntentBits, MessageFlags } from "discord.js";
 import { loadCommandsFromFile } from "./commands/loader.js";
+import DiscordClientOptions from "./discordClientOptions.js";
 
-export class DiscordClient {
-  constructor(options = {}){
+const commands = await loadCommandsFromFile(); 
+
+export default class DiscordClient {
+  authToken: string;
+  intents: GatewayIntentBits[];
+  client: Client;
+  constructor(options: DiscordClientOptions){
     this.authToken = options.authToken ?? "";
     this.intents = [GatewayIntentBits.Guilds];
   }
@@ -10,7 +16,6 @@ export class DiscordClient {
   // initialises the client and sets up event listeners
   async init(){
     this.client = new Client({ intents: this.intents });
-    this.client.commands = await loadCommandsFromFile();
 
     // events
     this.client.once(Events.ClientReady, this.onLogin);    
@@ -48,7 +53,7 @@ export class DiscordClient {
   async onInteraction(interaction){
     if (!interaction.isChatInputCommand()) return;
 
-    const command = interaction.client.commands.get(interaction.commandName);
+    const command = commands.get(interaction.commandName);
 
     if (!command) {
       console.error(`No command matching ${interaction.commandName} was found.`);

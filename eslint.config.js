@@ -1,13 +1,12 @@
-import { configs } from '@eslint/js';
+import globals from "globals";
+import pluginJs from "@eslint/js";
+import tseslint from "typescript-eslint";
 
+
+/** @type {import('eslint').Linter.Config[]} */
 export default [
-	configs.recommended,
-	{
-		languageOptions: {
-			ecmaVersion: 'latest',
-		},
-		rules: {
-      "semi": ["error", "always"]
-		},
-	},
+  {files: ["**/*.{js,mjs,cjs,ts}"]},
+  {languageOptions: { globals: globals.browser }},
+  pluginJs.configs.recommended,
+  ...tseslint.configs.recommended,
 ];
