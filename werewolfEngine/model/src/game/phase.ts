@@ -1,4 +1,4 @@
-import Guid from "./guid.js";
+import Guid from "../utility/guid.js";
 
 export default abstract class Phase {
   readonly id: Guid;  
@@ -33,8 +33,8 @@ export default abstract class Phase {
   // Gets the total duration of the phase. 
   // If not started then will return -1, if not ended will return duration as of current time
   durationMs(){
-    let started = this.dateStarted ? this.dateStarted.getTime() : Date.now() + 1;
-    let ended = this.dateStarted || this.dateEnded ? this.dateEnded.getTime() : Date.now();
+    const started = this.dateStarted ? this.dateStarted.getTime() : Date.now() + 1;
+    const ended = this.dateStarted || this.dateEnded ? this.dateEnded.getTime() : Date.now();
     return ended - started;
   }
 }

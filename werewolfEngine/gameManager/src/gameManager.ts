@@ -1,10 +1,10 @@
-import Game from "./model/game.js";
-import HostQueue from "./model/hostQueue.js";
-import Guid from "./model/guid.js";
-import GameStatus from "./model/gameStatus.js";
-import User from "./model/user.js";
-import { deleteGameData, loadGameData, saveGameData } from "./utility/gameDataUtils.js";
-import { exportGameManager, GameManagerImportError, importGameManager, initialisePaths } from "./utility/gameManagerUtils.js";
+import Game from "../../model/src/game/game.js";
+import HostQueue from "../../model/src/user/hostQueue.js";
+import Guid from "../../model/src/utility/guid.js";
+import GameStatus from "../../model/src/game/gameStatus.js";
+import User from "../../model/src/user/user.js";
+import { deleteGameData, loadGameData, saveGameData } from "./gameDataUtils.js";
+import { exportGameManager, GameManagerImportError, importGameManager, initialisePaths } from "./gameManagerUtils.js";
 
 class GameInfo{
   constructor(public id: Guid, public name: string, public status: GameStatus, public hostId?: Guid){}

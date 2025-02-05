@@ -1,6 +1,6 @@
-import Guid from "./guid.js";
+import Guid from "../utility/guid.js";
 import Player from "./player.js";
-import User from "./user.js";
+import User from "../user/user.js";
 import Phase from "./phase.js";
 import PlayerAction from "./playerAction.js";
 import GameStatus, { GameStatusSetup } from "./gameStatus.js";

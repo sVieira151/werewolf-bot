@@ -1,7 +1,7 @@
-import DiscordClient from "./src/discordClient.js";
-import GameManager from "./src/gameManager.js";
+import DiscordClient from "./bot/client/src/discordClient.js";
+import GameManager from "./werewolfEngine/gameManager/src/gameManager.js";
 import config from "./config.json" with { type: "json" };
-import DiscordClientOptions from "./src/discordClientOptions.js";
+import DiscordClientOptions from "./bot/client/src/discordClientOptions.js";
 
 // set game manager data path
 const gm = GameManager.import(process.cwd(), "localtest");

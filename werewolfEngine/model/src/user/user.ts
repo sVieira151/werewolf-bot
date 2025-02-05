@@ -1,4 +1,4 @@
-import Guid from "./guid.js";
+import Guid from "../utility/guid";
 
 export default class User{
   id: Guid;

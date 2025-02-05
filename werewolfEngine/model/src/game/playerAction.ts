@@ -1,5 +1,5 @@
 import PlayerActionStatus, { PlayerActionStatusNone, PlayerActionStatusSuccess, PlayerActionStatusUndone } from "./playerActionStatus.js";
-import Guid from "./guid.js";
+import Guid from "../utility/guid.js";
 import Player from "./player.js";
 import Phase from "./phase.js";
 
