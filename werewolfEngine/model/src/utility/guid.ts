@@ -7,6 +7,7 @@ export default class Guid {
     return this.value;
   }
   equals(other: Guid){
+    if (!other) return false;
     return this.value === other.value;
   }
 }

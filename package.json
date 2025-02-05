@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "lint": "eslint .",
-    "test:engine": "node --import tsx --test 'werewolfEngine/**/tests/**/*.test.ts'",
+    "test": "npx tsc && node --import tsx --test",
     "start": "npx tsc && node .",
     "deploy-cmds": "node deploy-commands.js"
   },
