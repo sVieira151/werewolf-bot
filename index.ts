@@ -4,7 +4,8 @@ import config from "./config.json" with { type: "json" };
 import DiscordClientOptions from "./src/discordClientOptions.js";
 
 // set game manager data path
-GameManager.get(process.cwd(), "localtest");
+const gm = GameManager.import(process.cwd(), "localtest");
+GameManager.export(gm);
 
 // start client
 const options = new DiscordClientOptions(config.token, []);

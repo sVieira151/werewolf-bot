@@ -4,7 +4,7 @@ import Guid from "./model/guid.js";
 import GameStatus from "./model/gameStatus.js";
 import User from "./model/user.js";
 import { deleteGameData, loadGameData, saveGameData } from "./utility/gameDataUtils.js";
-import { exportGameManager, importGameManager, initialisePaths } from "./utility/gameManagerUtils.js";
+import { exportGameManager, GameManagerImportError, importGameManager, initialisePaths } from "./utility/gameManagerUtils.js";
 
 class GameInfo{
   constructor(public id: Guid, public name: string, public status: GameStatus, public hostId?: Guid){}
@@ -20,23 +20,45 @@ export default class GameManager {
   dataPath: string;
   filePath: string;
   
-  private constructor(){
+  private constructor(public serverId: string){
     this.hosts = new HostQueue();
     this.gamesList = [];
     this.knownUsers = [];
   }  
 
-  static get(_dir: string, _serverId: string): GameManager{
-    const gm = new GameManager();
-    initialisePaths(gm, _dir, _serverId);
+  // gets an instance of GameManager for the specified serverId. If no
+  // file exists to import, a new one is generated 
+  static import(_dir: string, _serverId: string): GameManager{
+    const gm = new GameManager(_serverId);
     try{
+      initialisePaths(gm, _dir);
       importGameManager(gm);
-    } catch {
-      exportGameManager(gm);
+      console.log(`Imported GameManager for server: ${_serverId}`)
+    } catch (err) {
+      if (err instanceof GameManagerImportError){
+        console.log(`Unable to import. Generating file for GameManager for server: ${_serverId}`)
+        exportGameManager(gm);
+      } else if (err instanceof Error){
+        throw err;
+      }
     }
     console.log(gm);
     return gm;
   }  
+
+  // exports the data of the specified GameManager to disk
+  static export(_gm: GameManager){    
+    try{      
+      exportGameManager((_gm))
+      console.log(`Exported GameManager for server: ${_gm.serverId}`)
+    } catch (err) {
+      if (err instanceof Error){
+        console.log(`Unable to export GameManager for server: ${_gm.serverId}`)
+      } else {
+        throw err;
+      }
+    }
+  }
 
   // creates a new game with the specified name and host. Saves game data 
   // and adds to the games list
