@@ -1,7 +1,7 @@
 import Guid from "./guid.js";
 
 export default class User{
-  readonly id: Guid;
+  id: Guid;
   userName: string;
   avatarId: number;
   constructor(_userName: string, _avatarId: number){
