@@ -22,10 +22,10 @@ function generateUserList(numUsers: number): User[]{
   return users;
 }
 
-function setupStandard(){
-  maxEntriesPerUser = Math.ceil(Math.random()*4 + 1);
+function setupStandard(_numUsers: number = 5, _maxEntriesPerUser: number = 4){
+  maxEntriesPerUser = Math.floor(Math.random()*_maxEntriesPerUser + 1);
   emptyQueue = new HostQueue(maxEntriesPerUser);
-  usersList = generateUserList(5);
+  usersList = generateUserList(_numUsers);
   preparedQueue = new HostQueue(maxEntriesPerUser, usersList);
   initialCount = preparedQueue.count;
 }
@@ -52,7 +52,7 @@ describe("hostQueue.push()", () => {
   it("non-empty queue, passed existing max entries per user, error thrown", () => {
     assert.throws(() => {
       let i = 0;
-      while(i<=maxEntriesPerUser){
+      while(i<=maxEntriesPerUser+1){
         preparedQueue.push(usersList[0])
         i++;
       }
@@ -104,8 +104,16 @@ describe("hostQueue.contains()", (() => {
 
 // getHostQueueNames
 describe("hostQueue.getHostQueueNames()", (() => {
+  let preparedUserCount: number;
   beforeEach(()=> {
-    setupStandard();
+    preparedUserCount = Math.floor(Math.random()*8 + 1);
+    setupStandard(preparedUserCount);
+  })
+  it("empty queue, returns array of length 0", () => {
+    assert.deepStrictEqual(emptyQueue.getHostQueueNames().length, 0);
+  })
+  it("non-empty queue, returns array with length that matches user count", () => {
+    assert.deepStrictEqual(preparedQueue.getHostQueueNames().length, preparedUserCount);
   })
 }))
 
@@ -113,5 +121,51 @@ describe("hostQueue.getHostQueueNames()", (() => {
 describe("hostQueue.remove()", (() => {
   beforeEach(()=> {
     setupStandard();
+  })
+  it ("empty queue, passed positive index, doesn't throw & queue remains empty", ()=> {    
+    assert.doesNotThrow(() => emptyQueue.remove(1));
+    assert.strictEqual(emptyQueue.count, 0);
+  })
+  it ("empty queue, passed negative index, doesn't throw & queue remains empty", ()=> {    
+    assert.doesNotThrow(() => emptyQueue.remove(-6));
+    assert.strictEqual(emptyQueue.count, 0);
+  })
+  it ("empty queue, passed null, doesn't throw & queue remains empty", ()=> {    
+    assert.doesNotThrow(() => emptyQueue.remove(null));
+    assert.strictEqual(emptyQueue.count, 0);
+  })
+  it ("empty queue, passed undefined, doesn't throw & queue remains empty", ()=> {    
+    assert.doesNotThrow(() => emptyQueue.remove(undefined));
+    assert.strictEqual(emptyQueue.count, 0);
+  })
+  it ("non-empty queue, passed a valid index, queue count is one fewer than at start", ()=> {    
+    const expected = preparedQueue.count;
+    assert.doesNotThrow(() => preparedQueue.remove(0));
+    assert.strictEqual(preparedQueue.count, expected - 1);
+  })
+  it ("non-empty queue, passed a valid index, queue count is one fewer than at start", ()=> {    
+    const expected = preparedQueue.count;
+    assert.doesNotThrow(() => preparedQueue.remove(0));
+    assert.strictEqual(preparedQueue.count, expected - 1);
+  })
+  it ("non-empty queue, passed invalid positive index, doesn't throw & queue remains same size", ()=> {     
+    const expected = preparedQueue.count;  
+    assert.doesNotThrow(() => preparedQueue.remove(1564));
+    assert.strictEqual(preparedQueue.count, expected);
+  })
+  it ("non-empty queue, passed negative index, doesn't throw & queue remains same size", ()=> {     
+    const expected = preparedQueue.count;  
+    assert.doesNotThrow(() => preparedQueue.remove(-6));
+    assert.strictEqual(preparedQueue.count, expected);
+  })
+  it ("non-empty queue, passed null, doesn't throw & queue remains same size", ()=> {    
+    const expected = preparedQueue.count;  
+    assert.doesNotThrow(() => preparedQueue.remove(null));
+    assert.strictEqual(preparedQueue.count, expected);
+  })
+  it ("non-empty queue, passed undefined, doesn't throw & queue remains same size", ()=> {  
+    const expected = preparedQueue.count;    
+    assert.doesNotThrow(() => preparedQueue.remove(undefined));
+    assert.strictEqual(preparedQueue.count, expected);
   })
 }))

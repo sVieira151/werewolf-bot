@@ -20,7 +20,7 @@ export default class HostQueue
   push(user: User){
     if (!user) 
       throw Error("Unable to push user: user is null or undefined");
-    
+
     if (this.hostQueue.filter(x => x.id.equals(user.id)).length >= this.maxEntriesPerUser)
       throw Error(`Unable to push user: user has reached the limit (${this.maxEntriesPerUser}) for number of times they can appear in the queue`);
     this.hostQueue.push(user);
@@ -43,6 +43,8 @@ export default class HostQueue
 
   // removes the user at the specified position in the queue. 0 is first in the queue
   remove(index: number){
-    this.hostQueue.splice(index, 1);
+    if (index !== null && index >= 0 && index < this.count){
+      this.hostQueue.splice(index, 1);
+    }
   }
 }
