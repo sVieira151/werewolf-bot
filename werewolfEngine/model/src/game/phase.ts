@@ -78,7 +78,7 @@ export default abstract class Phase {
       return -1;
 
     this._status = new PhaseStatusStarted();
-    this._dateStarted = (this.status as PhaseStatusStarted).started;
+    this._dateStarted = this.status.createdDate;
 
     // end the game if max duration passes
     this.maxDurationTimeout = setTimeout(() => this.end(), this.maxDurationMs);
@@ -95,7 +95,7 @@ export default abstract class Phase {
     // clear the timeout since we are ending now
     clearTimeout(this.maxDurationTimeout);
     this._status = new PhaseStatusEnded(this.dateStarted);
-    this._dateEnded = (this.status as PhaseStatusEnded).ended;
+    this._dateEnded = this.status.createdDate;
     return this.dateEnded.getTime();
   }
 }
