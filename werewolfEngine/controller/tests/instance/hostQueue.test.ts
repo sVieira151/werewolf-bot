@@ -1,7 +1,7 @@
 import { beforeEach, describe, it } from "node:test";
 import assert from "node:assert";
-import HostQueue from "../../src/user/hostQueue";
-import User from "../../src/user/user";
+import HostQueue from "../../src/instance/hostQueue";
+import User from "../../../model/src/user/user";
 
 let emptyQueue: HostQueue;
 let preparedQueue: HostQueue;

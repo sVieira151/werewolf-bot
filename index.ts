@@ -1,5 +1,5 @@
 import DiscordClient from "./bot/client/src/discordClient.js";
-import GameManager from "./werewolfEngine/gameManager/src/gameManager.js";
+import GameManager from "./werewolfEngine/controller/src/instance/instanceManager.js";
 import config from "./config.json" with { type: "json" };
 import DiscordClientOptions from "./bot/client/src/discordClientOptions.js";
 

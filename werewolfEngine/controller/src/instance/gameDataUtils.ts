@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs";
-import Game from "../../model/src/game/game";
-import Guid from "../../model/src/utility/guid";
+import Game from "../../../model/src/game/game";
+import Guid from "../../../model/src/utility/guid";
 
 const GAME_FILENAME = (game: string) => `${game}.json`;
 
