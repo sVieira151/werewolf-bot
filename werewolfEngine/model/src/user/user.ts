@@ -9,4 +9,10 @@ export default class User{
     this.userName = _userName;
     this.avatarId = _avatarId;
   }
+
+  equals(other: User){
+    if (!other)
+      return false;
+    return this.id.equals(other.id);
+  }
 }
