@@ -5,7 +5,7 @@ import Phase from "./phase.js";
 
 export default abstract class PlayerAction{
   readonly id: Guid;
-  phase?: Phase;
+  phaseDone?: Phase;
   phaseUndone?: Phase;
   status: PlayerActionStatus;
   constructor(readonly player: Player, readonly target?: Player){
@@ -15,7 +15,7 @@ export default abstract class PlayerAction{
 
   do(_phase: Phase){
     this.status = this.onDo();
-    this.phase = _phase;
+    this.phaseDone = _phase;
   }
 
   undo(_phase: Phase){

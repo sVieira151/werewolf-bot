@@ -1,16 +1,20 @@
 export default abstract class PlayerStatus {
+  createdDate: Date;
+  constructor(){
+    this.createdDate = new Date();
+  }
   abstract print() : string;
 } 
 
-export class PlayerStatusAlive implements PlayerStatus {
+export class PlayerStatusAlive extends PlayerStatus {
   print() { return "Alive" };
 }
-export class PlayerStatusInjured implements PlayerStatus {
+export class PlayerStatusInjured extends PlayerStatus {
   print() { return "Injured" };
 }
-export class PlayerStatusDead implements PlayerStatus {
+export class PlayerStatusDead extends PlayerStatus {
   print() { return "Dead" };
 }
-export class PlayerStatusUnknown implements PlayerStatus {
+export class PlayerStatusUnknown extends PlayerStatus {
   print() { return "Unknown" };
 }
