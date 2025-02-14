@@ -8,6 +8,8 @@ const numPhases: number = 3;
 let maxDuration: number;
 let preparedPhasesNoLinks: Phase[];
 let preparedPhasesWithLinks: Phase[];
+let startedPhase: Phase;
+let endedPhase: Phase;
 
 class MockPhase extends Phase{
   set previousPhaseOverride(p: Phase) { this._previousPhase = p; }
@@ -32,6 +34,12 @@ function standardSetup(){
     }
     preparedPhasesWithLinks.push(p);
   }
+
+  startedPhase = new MockPhase(phaseName, 0, maxDuration);
+  startedPhase.start();
+  endedPhase = new MockPhase(phaseName, 1, maxDuration);
+  endedPhase.start();
+  endedPhase.end();
 }
 
 describe("phase.displayName", ()=>{
@@ -366,8 +374,32 @@ describe("phase.setNextPhase()", ()=>{
 
 describe("phase.start()", ()=>{
   beforeEach(standardSetup);
+  it("phase not started, returns current time", ()=>{
+    const phase = new MockPhase(phaseName, 0, maxDuration);
+    assert.strictEqual(phase.start(), Date.now());
+  })
+  it("phase started, returns -1", ()=>{
+    const phase = startedPhase;
+    assert.strictEqual(phase.start(), -1);    
+  })
+  it("phase ended, returns -1", ()=>{
+    const phase = endedPhase;
+    assert.strictEqual(phase.start(), -1);    
+  })
 })
 
 describe("phase.end()", ()=>{
   beforeEach(standardSetup);
+  it("phase started, returns current time", ()=>{
+    const phase = startedPhase;
+    assert.strictEqual(phase.end(), Date.now());
+  })
+  it("phase not started, returns -1", ()=>{
+    const phase = new MockPhase(phaseName, 0, maxDuration);
+    assert.strictEqual(phase.end(), -1);    
+  })
+  it("phase ended, returns -1", ()=>{
+    const phase = endedPhase;
+    assert.strictEqual(phase.start(), -1);    
+  })
 })
