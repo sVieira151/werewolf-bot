@@ -1,19 +1,18 @@
 import { beforeEach, describe, it } from "node:test";
 import assert from "node:assert";
-import Phase from "../../src/game/phase";
 import { setTimeout } from "node:timers/promises";
+import Phase from "../../../model/src/game/phase";
+import PhaseController from "../../src/game/phaseController";
 
 const phaseName: string = "Test";
 const numPhases: number = 3;
 let maxDuration: number;
-let preparedPhasesNoLinks: Phase[];
-let preparedPhasesWithLinks: Phase[];
-let startedPhase: Phase;
-let endedPhase: Phase;
+let preparedPhasesNoLinks: PhaseController[];
+let preparedPhasesWithLinks: PhaseController[];
+let startedPhase: PhaseController;
+let endedPhase: PhaseController;
 
 class MockPhase extends Phase{
-  set previousPhaseOverride(p: Phase) { this._previousPhase = p; }
-  set nextPhaseOverride(p: Phase) { this._nextPhase = p; }
 }
 
 function standardSetup(){
@@ -21,58 +20,57 @@ function standardSetup(){
   preparedPhasesWithLinks = []
   maxDuration = Math.floor(Math.random()*5*1000+5000); // minimum 5 seconds, maximum 10 seconds
   for(let i=0; i<numPhases; i++){
-    const newPhase = () => new MockPhase(phaseName, i, maxDuration);
     // phases with no links
-    let p: MockPhase = newPhase();
+    let p: PhaseController = PhaseController.Create(MockPhase, phaseName, i, maxDuration);
     preparedPhasesNoLinks.push(p);
 
     // phases with links
-    p = newPhase();
+    p = PhaseController.Create(MockPhase, phaseName, i, maxDuration);
     if (i >= 1){
-      p.previousPhaseOverride = preparedPhasesWithLinks[i-1];
-      (preparedPhasesWithLinks[i-1] as MockPhase).nextPhaseOverride = p;
+      p.phase.previousPhase = preparedPhasesWithLinks[i-1].phase;
+      preparedPhasesWithLinks[i-1].phase.nextPhase = p.phase;
     }
     preparedPhasesWithLinks.push(p);
   }
 
-  startedPhase = new MockPhase(phaseName, 0, maxDuration);
+  startedPhase = PhaseController.Create(MockPhase, phaseName, 0, maxDuration);
   startedPhase.start();
-  endedPhase = new MockPhase(phaseName, 1, maxDuration);
+  endedPhase = PhaseController.Create(MockPhase, phaseName, 1, maxDuration);
   endedPhase.start();
   endedPhase.end();
 }
 
-describe("phase.displayName", ()=>{
+describe("PhaseController.displayName", ()=>{
   beforeEach(standardSetup);
   it("phase exists, display name matches expected format",()=>{
     const index = Math.floor(Math.random()*numPhases);
     assert.strictEqual(preparedPhasesNoLinks[index].displayName, `${phaseName} ${index}`);
   })
   it("phase exists, name undefined, display name matches expected format",()=>{
-    const phase = new MockPhase(undefined, 0, 5000);
+    const phase = PhaseController.Create(MockPhase, undefined, 0, maxDuration);
     assert.strictEqual(phase.displayName, `${undefined} ${0}`);
   })
   it("phase exists, name null, display name matches expected format",()=>{
-    const phase = new MockPhase(null, 0, 5000);
+    const phase = PhaseController.Create(MockPhase, null, 0, maxDuration);
     assert.strictEqual(phase.displayName, `${null} ${0}`);
   })
 });
 
-describe("phase.durationInMs", ()=>{
+describe("PhaseController.durationInMs", ()=>{
   beforeEach(standardSetup);
   it("phase not started, returns -1", ()=>{
-    const phase = new MockPhase(phaseName, 0, 5000);
+    const phase = PhaseController.Create(MockPhase, phaseName, 0, maxDuration);
     assert.strictEqual(phase.durationInMs, -1);
   })
   it("phase started and not ended, returns difference from start to current time", ()=>{
-    const phase = new MockPhase(phaseName, 0, 5000);
+    const phase = PhaseController.Create(MockPhase, phaseName, 0, maxDuration);
     const start = phase.start();
     setTimeout(1000);
     const end = Date.now();  
     assert.strictEqual(phase.durationInMs, end - start);
   })
   it("phase started and ended (doesn't exceed max), returns difference from start to end time", ()=>{
-    const phase = new MockPhase(phaseName, 0, 5000);
+    const phase = PhaseController.Create(MockPhase, phaseName, 0, maxDuration);
     const start = phase.start();
     setTimeout(1000);  
     const end = phase.end();
@@ -80,7 +78,7 @@ describe("phase.durationInMs", ()=>{
   })
   it("phase started and ended (does exceed max), returns (approx) max duration time", async ()=>{ 
     const maxDurationMs = 5000;
-    const phase = new MockPhase(phaseName, 0, maxDurationMs);
+    const phase = PhaseController.Create(MockPhase, phaseName, 0, maxDurationMs);
     phase.start();
     await setTimeout(maxDurationMs + 1000);  
     assert.strictEqual(phase.durationInMs >= maxDurationMs, true, "Duration is less than MaxDurationInMs !");
@@ -88,14 +86,14 @@ describe("phase.durationInMs", ()=>{
   })
 })
 
-describe("phase.setPreviousPhase()", ()=>{
+describe("PhaseController.setPreviousPhase()", ()=>{
   beforeEach(standardSetup);
   it("no previous phase & no next phase, passed valid phase, phase's previous phase is same as phase provided", ()=>{
     const phase = preparedPhasesNoLinks[1];
     assert.equal(phase.previousPhase, null, "Phase not set up correctly - has previous phase");
     assert.equal(phase.nextPhase, null, "Phase not set up correctly - has next phase!");
 
-    const previous = preparedPhasesNoLinks[0];
+    const previous = preparedPhasesNoLinks[0].phase;
     phase.setPreviousPhase(previous);
     assert.strictEqual(phase.previousPhase, previous);
   })
@@ -120,7 +118,7 @@ describe("phase.setPreviousPhase()", ()=>{
     assert.notEqual(phase.previousPhase, null, "Phase not set up correctly - has no previous phase");
     assert.equal(phase.nextPhase, null, "Phase not set up correctly - has next phase!");
 
-    const previous = new MockPhase(phaseName, 999, maxDuration);
+    const previous = PhaseController.Create(MockPhase, phaseName, 999, maxDuration).phase;
     phase.setPreviousPhase(previous);
     assert.strictEqual(phase.previousPhase, previous);
   })
@@ -156,7 +154,7 @@ describe("phase.setPreviousPhase()", ()=>{
     assert.equal(phase.previousPhase, null, "Phase not set up correctly - has previous phase");
     assert.notEqual(phase.nextPhase, null, "Phase not set up correctly - has no next phase!");
 
-    const previous = new MockPhase(phaseName, 999, maxDuration);
+    const previous = PhaseController.Create(MockPhase, phaseName, 999, maxDuration).phase;
     phase.setPreviousPhase(previous);
     assert.strictEqual(phase.previousPhase, previous);
   })
@@ -181,7 +179,7 @@ describe("phase.setPreviousPhase()", ()=>{
     assert.equal(phase.previousPhase, null, "Phase not set up correctly - has previous phase");
     assert.notEqual(phase.nextPhase, null, "Phase not set up correctly - has no next phase!");
 
-    const next = preparedPhasesWithLinks[1];
+    const next = preparedPhasesWithLinks[1].phase;
     assert.throws(() => phase.setPreviousPhase(next), "Expected error thrown if attempting to set previous to existing next phase");
   })
   it("has previous phase & has next phase, passed valid phase, phase's previous phase is same as phase provided", ()=>{
@@ -189,7 +187,7 @@ describe("phase.setPreviousPhase()", ()=>{
     assert.notEqual(phase.previousPhase, null, "Phase not set up correctly - has no previous phase");
     assert.notEqual(phase.nextPhase, null, "Phase not set up correctly - has no next phase!");
 
-    const previous = new MockPhase(phaseName, 999, maxDuration);
+    const previous = PhaseController.Create(MockPhase, phaseName, 999, maxDuration).phase;
     phase.setPreviousPhase(previous);
     assert.strictEqual(phase.previousPhase, previous);
   })
@@ -225,19 +223,19 @@ describe("phase.setPreviousPhase()", ()=>{
     assert.notEqual(phase.previousPhase, null, "Phase not set up correctly - has no previous phase");
     assert.notEqual(phase.nextPhase, null, "Phase not set up correctly - has no next phase!");
 
-    const next = preparedPhasesWithLinks[2];
+    const next = preparedPhasesWithLinks[2].phase;
     assert.throws(() => phase.setPreviousPhase(next), "Expected error thrown if attempting to set previous to existing next phase");
   })
 })
 
-describe("phase.setNextPhase()", ()=>{
+describe("PhaseController.setNextPhase()", ()=>{
   beforeEach(standardSetup);
   it("no previous phase & no next phase, passed valid phase, phase's next phase is same as phase provided", ()=>{
     const phase = preparedPhasesNoLinks[1];
     assert.equal(phase.previousPhase, null, "Phase not set up correctly - has previous phase");
     assert.equal(phase.nextPhase, null, "Phase not set up correctly - has next phase!");
 
-    const next = preparedPhasesNoLinks[0];
+    const next = preparedPhasesNoLinks[0].phase;
     phase.setNextPhase(next);
     assert.strictEqual(phase.nextPhase, next);
   })
@@ -262,7 +260,7 @@ describe("phase.setNextPhase()", ()=>{
     assert.notEqual(phase.previousPhase, null, "Phase not set up correctly - has no previous phase");
     assert.equal(phase.nextPhase, null, "Phase not set up correctly - has next phase!");
 
-    const next = new MockPhase(phaseName, 999, maxDuration);
+    const next = PhaseController.Create(MockPhase, phaseName, 999, maxDuration).phase;
     phase.setNextPhase(next);
     assert.strictEqual(phase.nextPhase, next);
   })
@@ -271,7 +269,7 @@ describe("phase.setNextPhase()", ()=>{
     assert.notEqual(phase.previousPhase, null, "Phase not set up correctly - has no previous phase");
     assert.equal(phase.nextPhase, null, "Phase not set up correctly - has next phase!");
 
-    const previous = preparedPhasesWithLinks[numPhases-2];
+    const previous = preparedPhasesWithLinks[numPhases-2].phase;
     assert.throws(() => phase.setNextPhase(previous), "Expected error thrown if attempting to set previous to existing next phase");
   })
   it("has previous phase & no next phase, passed null, phase's next phase is null", ()=>{
@@ -295,7 +293,7 @@ describe("phase.setNextPhase()", ()=>{
     assert.equal(phase.previousPhase, null, "Phase not set up correctly - has previous phase");
     assert.notEqual(phase.nextPhase, null, "Phase not set up correctly - has no next phase!");
 
-    const next = new MockPhase(phaseName, 999, maxDuration);
+    const next = PhaseController.Create(MockPhase, phaseName, 999, maxDuration).phase;
     phase.setNextPhase(next);
     assert.strictEqual(phase.nextPhase, next);
   })
@@ -331,7 +329,7 @@ describe("phase.setNextPhase()", ()=>{
     assert.notEqual(phase.previousPhase, null, "Phase not set up correctly - has no previous phase");
     assert.notEqual(phase.nextPhase, null, "Phase not set up correctly - has no next phase!");
 
-    const next = new MockPhase(phaseName, 999, maxDuration);
+    const next = PhaseController.Create(MockPhase, phaseName, 999, maxDuration).phase;
     phase.setNextPhase(next);
     assert.strictEqual(phase.nextPhase, next);
   })
@@ -367,15 +365,15 @@ describe("phase.setNextPhase()", ()=>{
     assert.notEqual(phase.previousPhase, null, "Phase not set up correctly - has no previous phase");
     assert.notEqual(phase.nextPhase, null, "Phase not set up correctly - has no next phase!");
 
-    const previous = preparedPhasesWithLinks[0];
+    const previous = preparedPhasesWithLinks[0].phase;
     assert.throws(() => phase.setNextPhase(previous), "Expected error thrown if attempting to set previous to existing next phase");
   })
 })
 
-describe("phase.start()", ()=>{
+describe("PhaseController.start()", ()=>{
   beforeEach(standardSetup);
   it("phase not started, returns current time", ()=>{
-    const phase = new MockPhase(phaseName, 0, maxDuration);
+    const phase = PhaseController.Create(MockPhase, phaseName, 0, maxDuration);
     assert.strictEqual(phase.start(), Date.now());
   })
   it("phase started, returns -1", ()=>{
@@ -388,14 +386,14 @@ describe("phase.start()", ()=>{
   })
 })
 
-describe("phase.end()", ()=>{
+describe("PhaseController.end()", ()=>{
   beforeEach(standardSetup);
   it("phase started, returns current time", ()=>{
     const phase = startedPhase;
     assert.strictEqual(phase.end(), Date.now());
   })
   it("phase not started, returns -1", ()=>{
-    const phase = new MockPhase(phaseName, 0, maxDuration);
+    const phase = PhaseController.Create(MockPhase, phaseName, 0, maxDuration);
     assert.strictEqual(phase.end(), -1);    
   })
   it("phase ended, returns -1", ()=>{

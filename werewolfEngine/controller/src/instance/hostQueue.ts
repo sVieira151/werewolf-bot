@@ -1,4 +1,4 @@
-import User from "./user.js";
+import User from "../../../model/src/user/user";
 
 export default class HostQueue
 {
