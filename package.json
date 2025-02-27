@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "lint": "eslint .",
+    "test": "npx tsc && node --import tsx --test",
     "start": "npx tsc && node .",
-    "deploy": "node deploy-commands.js"
+    "deploy-cmds": "node deploy-commands.js"
   },
   "keywords": [],
   "author": "",
@@ -21,8 +22,10 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
+    "concurrently": "^9.1.2",
     "eslint": "^9.19.0",
     "globals": "^15.14.0",
+    "tsx": "^4.19.2",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.22.0"
   }

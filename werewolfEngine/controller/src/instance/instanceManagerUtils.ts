@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import GameManager from "../gameManager";
+import GameManager from "./instanceManager";
 
 const FILENAME = "gameManager.json";
 
