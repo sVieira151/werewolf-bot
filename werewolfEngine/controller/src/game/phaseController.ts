@@ -1,5 +1,7 @@
 import Phase from "../../../model/src/game/phase";
-import { PhaseStatusEnded, PhaseStatusNotStarted, PhaseStatusStarted } from "../../../model/src/game/phaseStatus";
+import { DefaultPhaseStatusNames } from "../../../model/src/game/phaseStatus";
+
+
 
 export default class PhaseController {  
   private maxDurationTimeout: NodeJS.Timeout; 
@@ -12,16 +14,14 @@ export default class PhaseController {
 
   // Gets the total duration of the phase. 
   // If not started then will return -1, if not ended will return duration as of current time
-  get durationInMs() { return this.phase.status.phaseDuration };
+  get durationInMs() { return this.phase.phaseDurationInMs };
 
   // Gets a formatted name for displaying
   get displayName(){    
     return `${this.phase.name} ${this.phase.iteration}`;
   }
 
-  constructor(readonly phase: Phase){
-  
-  }
+  constructor(readonly phase: Phase){}
 
   // instantiates a new phase controller with a phase of the specified subtype
   static Create<T extends Phase>(p: new() => T, name: string, iteration: number, maxDurationInMs: number): PhaseController {
@@ -30,6 +30,7 @@ export default class PhaseController {
     phase.name = name;
     phase.iteration = iteration;
     phase.maxDurationMs = maxDurationInMs; 
+    phase.addStatus(DefaultPhaseStatusNames.NOT_STARTED);
     return new PhaseController(phase);
   }  
 
@@ -73,11 +74,11 @@ export default class PhaseController {
   // Returns -1 if Phase has already been started
   start(): number {
     const phase = this.phase;
-    if (!(phase.status instanceof PhaseStatusNotStarted))
+    if (phase.currentStatus && phase.currentStatus.name !== DefaultPhaseStatusNames.NOT_STARTED)
       return -1;
 
-    phase.status = new PhaseStatusStarted();
-    phase.dateStarted = phase.status.createdDate;
+    // add the new status
+    phase.dateStarted = phase.addStatus(DefaultPhaseStatusNames.STARTED).createdDate;
 
     // end the game if max duration passes
     this.maxDurationTimeout = setTimeout(() => this.end(), phase.maxDurationMs);
@@ -89,13 +90,29 @@ export default class PhaseController {
   // Returns -1 if Phase has not been started or has already been ended
   end(): number {
     const phase = this.phase;
-    if (!(phase.status instanceof PhaseStatusStarted))
+    if (phase.currentStatus && phase.currentStatus.name !== DefaultPhaseStatusNames.STARTED)
       return -1;
 
     // clear the timeout since we are ending now
     clearTimeout(this.maxDurationTimeout);
-    phase.status = new PhaseStatusEnded(phase.dateStarted);
-    phase.dateEnded = phase.status.createdDate;
+
+    // add the new status
+    phase.dateEnded = phase.addStatus(DefaultPhaseStatusNames.ENDED).createdDate;
+    return phase.dateEnded.getTime();
+  }
+
+  // Updates the status to abandoned and returns the date abandoned in Ms. 
+  // Returns -1 if Phase has already been ended
+  abandon(): number {
+    const phase = this.phase;
+    if (phase.currentStatus && phase.currentStatus.name !== DefaultPhaseStatusNames.ENDED)
+      return -1;
+
+    // clear the timeout since we are ending now
+    clearTimeout(this.maxDurationTimeout);
+
+    // add the new status
+    phase.dateEnded = phase.addStatus(DefaultPhaseStatusNames.ENDED).createdDate;
     return phase.dateEnded.getTime();
   }
 }

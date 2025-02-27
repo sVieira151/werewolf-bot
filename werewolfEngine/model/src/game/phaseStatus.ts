@@ -1,30 +1,24 @@
-export default abstract class PhaseStatus {
-  createdDate: Date;
-  constructor(){
-    this.createdDate = new Date();
-  }
-  abstract print() : string;
-  abstract get phaseDuration(): number;
-} 
+import Guid from "../utility/guid";
+import IIdentifiable from "../utility/identifiable";
+import { IStatus, StatusFactory } from "../utility/status";
 
-export class PhaseStatusNotStarted extends PhaseStatus {
-  print() { return "Not Started" };
-  get phaseDuration(): number {
-    return -1;
+export const DefaultPhaseStatusNames = {
+  NOT_STARTED: "NotStarted",
+  STARTED: "Started",
+  ENDED: "Ended",
+  ABANDONED: "Abandoned"
+};
+
+export class PhaseStatusFactory extends StatusFactory<PhaseStatus> {}
+
+export default class PhaseStatus implements IStatus, IIdentifiable<PhaseStatus> {
+  id: Guid = new Guid();
+  name: string =  DefaultPhaseStatusNames.NOT_STARTED
+  createdDate?: Date;
+
+  equals(other: PhaseStatus): boolean {
+    if (!other)
+      return false;
+    return this.id.equals(other.id);      
   }
-}
-export class PhaseStatusStarted extends PhaseStatus {
-  print() { return "Started" };
-  get phaseDuration(): number {
-    return Date.now() - this.createdDate.getTime();
-  }
-}
-export class PhaseStatusEnded extends PhaseStatus {
-  constructor(readonly phaseStartDate: Date){
-    super();
-  }
-  print() { return "Ended" };
-  get phaseDuration(): number {
-    return this.createdDate.getTime() - this.phaseStartDate.getTime();
-  }
-}
+} 

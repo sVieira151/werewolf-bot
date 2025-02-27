@@ -1,19 +1,25 @@
-export default abstract class GameStatus {
-  abstract print() : string;
-} 
+import Guid from "../utility/guid";
+import IIdentifiable from "../utility/identifiable";
+import { IStatus, StatusFactory } from "../utility/status";
 
-export class GameStatusSetup extends GameStatus {
-  print() { return "Setup" };
-}
-export class GameStatusSignup extends GameStatus {
-  print() { return "Signup" };
-}
-export class GameStatusInProgress extends GameStatus {
-  print() { return "In Progress" };
-}
-export class GameStatusCompleted extends GameStatus {
-  print() { return "Completed" };
-}
-export class GameStatusAbandoned extends GameStatus {
-  print() { return "Abandoned" };
-}
+export const DefaultGameStatusNames = {
+  NOT_STARTED: "NotStarted",
+  SIGNUP: "Signup",
+  STARTED: "Started",
+  ENDED: "Ended",
+  ABANDONED: "Abandoned"
+};
+
+export class GameStatusFactory extends StatusFactory<GameStatus> {}
+
+export default class GameStatus implements IStatus, IIdentifiable<GameStatus> {
+  id: Guid = new Guid();
+  name: string =  DefaultGameStatusNames.NOT_STARTED
+  createdDate?: Date;
+
+  equals(other: GameStatus): boolean {
+    if (!other)
+      return false;
+    return this.id.equals(other.id);      
+  }
+} 

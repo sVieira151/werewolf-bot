@@ -1,6 +1,7 @@
 import Guid from "../utility/guid";
+import IIdentifiable from "../utility/identifiable";
 
-export default class User{
+export default class User implements IIdentifiable<User>{
   id: Guid;
   userName: string;
   avatarId: number;

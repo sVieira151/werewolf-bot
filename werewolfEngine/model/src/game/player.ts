@@ -1,15 +1,17 @@
 import PlayerStatus, { PlayerStatusAlive } from "./playerStatus.js";
 import Role from "./role.js";
 import User from "../user/user.js";
+import IIdentifiable from "../utility/identifiable.js";
+import Guid from "../utility/guid.js";
 
-export default class Player{
+export default class Player implements IIdentifiable<Player>  {
+  get id(): Guid { return this.user.id }; 
   constructor(readonly user: User, public role: Role, public status: PlayerStatus = new PlayerStatusAlive()){    
   }
 
-  // returns true if the user id matches the other user id, returns false otherwise
-  equals(other: User): boolean{
+  equals(other: Player): boolean {
     if (!other)
       return false;
-    return this.user.id.equals(other.id);
+    return this.user.id.equals(other.user.id);    
   }
 }
