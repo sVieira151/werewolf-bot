@@ -14,13 +14,21 @@ export interface IStatusContainer<T extends IStatus> {
 }
 
 export abstract class StatusFactory<T extends IStatus> implements IStatusFactory<T> {
-  constructor(private instantiator: new() => T){
+  private statusProducer: new() => T;
+  constructor(){
+    this.statusProducer = this.getStatusProducer();
   }
+  abstract getStatusProducer(): new() => T;
+  
   create(name: string, dateCreated: Date): T {
-    const result = new this.instantiator();
+    const result = new this.statusProducer();
     result.name = name;
     result.createdDate = dateCreated;
     return result;
+  }
+
+  static getInstance<T extends IStatus, U extends StatusFactory<T>>(c: new() => U): StatusFactory<T> {
+    return new c();
   }
 }
 
@@ -28,9 +36,13 @@ export abstract class StatusContainer<
   StatusType extends IStatus,
   FactoryType extends StatusFactory<StatusType>
   > {  
-  private statusFactory: FactoryType;
   statusHistory: StatusType[] = [];
+  private statusFactory: FactoryType;
   
+  constructor(factoryInstantiator: new() => FactoryType){
+    this.statusFactory = new factoryInstantiator();
+  }
+
   // returns the most recent status in the status history
   // returns null if no status in history
   get currentStatus(): StatusType {

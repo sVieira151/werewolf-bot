@@ -9,7 +9,11 @@ export const DefaultPhaseStatusNames = {
   ABANDONED: "Abandoned"
 };
 
-export class PhaseStatusFactory extends StatusFactory<PhaseStatus> {}
+export class PhaseStatusFactory extends StatusFactory<PhaseStatus> {
+  getStatusProducer(): new () => PhaseStatus {
+    return PhaseStatus;
+  }
+}
 
 export default class PhaseStatus implements IStatus, IIdentifiable<PhaseStatus> {
   id: Guid = new Guid();

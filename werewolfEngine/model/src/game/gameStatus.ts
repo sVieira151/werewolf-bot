@@ -10,7 +10,11 @@ export const DefaultGameStatusNames = {
   ABANDONED: "Abandoned"
 };
 
-export class GameStatusFactory extends StatusFactory<GameStatus> {}
+export class GameStatusFactory extends StatusFactory<GameStatus> {
+  getStatusProducer(): new () => GameStatus {
+    return GameStatus;
+  }
+}
 
 export default class GameStatus implements IStatus, IIdentifiable<GameStatus> {
   id: Guid = new Guid();

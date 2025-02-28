@@ -20,6 +20,10 @@ export default class Phase extends StatusContainer<PhaseStatus, PhaseStatusFacto
     return end - start;
   }
 
+  constructor(){
+    super(PhaseStatusFactory);
+  }
+
   equals(other: Phase): boolean {    
     if (!other)
       return false;

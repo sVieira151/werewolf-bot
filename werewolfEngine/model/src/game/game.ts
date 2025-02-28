@@ -16,6 +16,10 @@ export default class Game extends StatusContainer<GameStatus, GameStatusFactory>
   phases: Phase[] = [];
   playerActions: PlayerAction[] = []; 
 
+  constructor(){
+    super(GameStatusFactory);
+  }
+
   equals(other: Game): boolean {    
     if (!other)
       return false;

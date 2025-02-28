@@ -7,7 +7,7 @@ import { exportGameManager, GameManagerImportError, importGameManager, initialis
 import GameController from "../game/gameController.js";
 
 class GameInfo{
-  constructor(public id: Guid, public name: string, public status: GameStatus, public hostId?: Guid){}
+  constructor(public id: Guid, public name: string, public statusHistory: GameStatus[], public hostId?: Guid){}
   matchesName(name: string){
     return this.name.toLowerCase() === name.toLowerCase();
   }
