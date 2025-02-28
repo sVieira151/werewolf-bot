@@ -11,6 +11,7 @@ let preparedPhasesNoLinks: PhaseController[];
 let preparedPhasesWithLinks: PhaseController[];
 let startedPhase: PhaseController;
 let endedPhase: PhaseController;
+let abandonedPhase: PhaseController;
 
 class MockPhase extends Phase{
 }
@@ -38,6 +39,9 @@ function standardSetup(){
   endedPhase = PhaseController.Create(MockPhase, phaseName, 1, maxDuration);
   endedPhase.start();
   endedPhase.end();
+  abandonedPhase = PhaseController.Create(MockPhase, phaseName, 1, maxDuration);
+  abandonedPhase.start();
+  abandonedPhase.abandon();
 }
 
 describe("PhaseController.displayName", ()=>{
@@ -384,6 +388,10 @@ describe("PhaseController.start()", ()=>{
     const phase = endedPhase;
     assert.strictEqual(phase.start(), -1);    
   })
+  it("phase abandoned, returns -1", ()=>{
+    const phase = abandonedPhase;
+    assert.strictEqual(phase.start(), -1);    
+  })
 })
 
 describe("PhaseController.end()", ()=>{
@@ -398,6 +406,30 @@ describe("PhaseController.end()", ()=>{
   })
   it("phase ended, returns -1", ()=>{
     const phase = endedPhase;
-    assert.strictEqual(phase.start(), -1);    
+    assert.strictEqual(phase.end(), -1);    
+  })
+  it("phase abandoned, returns -1", ()=>{
+    const phase = abandonedPhase;
+    assert.strictEqual(phase.end(), -1);    
+  })
+})
+
+describe("PhaseController.abandon()", ()=>{
+  beforeEach(standardSetup);
+  it("phase started, returns current time", ()=>{
+    const phase = startedPhase;
+    assert.strictEqual(phase.abandon(), Date.now());
+  })
+  it("phase not started, returns -1", ()=>{
+    const phase = PhaseController.Create(MockPhase, phaseName, 0, maxDuration);
+    assert.strictEqual(phase.abandon(), -1);    
+  })
+  it("phase ended, returns -1", ()=>{
+    const phase = endedPhase;
+    assert.strictEqual(phase.abandon(), -1);    
+  })
+  it("phase abandoned, returns -1", ()=>{
+    const phase = abandonedPhase;
+    assert.strictEqual(phase.abandon(), -1);    
   })
 })

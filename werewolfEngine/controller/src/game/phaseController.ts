@@ -102,10 +102,10 @@ export default class PhaseController {
   }
 
   // Updates the status to abandoned and returns the date abandoned in Ms. 
-  // Returns -1 if Phase has already been ended
+  // Returns -1 if Phase has already been ended/abandoned or hasn't started
   abandon(): number {
     const phase = this.phase;
-    if (phase.currentStatus && phase.currentStatus.name !== DefaultPhaseStatusNames.ENDED)
+    if (phase.currentStatus && phase.currentStatus.name !== DefaultPhaseStatusNames.STARTED)
       return -1;
 
     // clear the timeout since we are ending now
