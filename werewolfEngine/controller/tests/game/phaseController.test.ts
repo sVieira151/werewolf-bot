@@ -1,7 +1,6 @@
 import { beforeEach, describe, it } from "node:test";
 import assert from "node:assert";
 import { setTimeout } from "node:timers/promises";
-import Phase from "../../../model/src/game/phase";
 import PhaseController from "../../src/game/phaseController";
 
 const phaseName: string = "Test";
@@ -13,20 +12,17 @@ let startedPhase: PhaseController;
 let endedPhase: PhaseController;
 let abandonedPhase: PhaseController;
 
-class MockPhase extends Phase{
-}
-
 function standardSetup(){
   preparedPhasesNoLinks = [];
   preparedPhasesWithLinks = []
   maxDuration = Math.floor(Math.random()*5*1000+5000); // minimum 5 seconds, maximum 10 seconds
   for(let i=0; i<numPhases; i++){
     // phases with no links
-    let p: PhaseController = PhaseController.Create(MockPhase, phaseName, i, maxDuration);
+    let p: PhaseController = PhaseController.Create(phaseName, i, maxDuration);
     preparedPhasesNoLinks.push(p);
 
     // phases with links
-    p = PhaseController.Create(MockPhase, phaseName, i, maxDuration);
+    p = PhaseController.Create(phaseName, i, maxDuration);
     if (i >= 1){
       p.phase.previousPhase = preparedPhasesWithLinks[i-1].phase;
       preparedPhasesWithLinks[i-1].phase.nextPhase = p.phase;
@@ -34,12 +30,12 @@ function standardSetup(){
     preparedPhasesWithLinks.push(p);
   }
 
-  startedPhase = PhaseController.Create(MockPhase, phaseName, 0, maxDuration);
+  startedPhase = PhaseController.Create(phaseName, 0, maxDuration);
   startedPhase.start();
-  endedPhase = PhaseController.Create(MockPhase, phaseName, 1, maxDuration);
+  endedPhase = PhaseController.Create(phaseName, 1, maxDuration);
   endedPhase.start();
   endedPhase.end();
-  abandonedPhase = PhaseController.Create(MockPhase, phaseName, 1, maxDuration);
+  abandonedPhase = PhaseController.Create(phaseName, 1, maxDuration);
   abandonedPhase.start();
   abandonedPhase.abandon();
 }
@@ -51,11 +47,11 @@ describe("PhaseController.displayName", ()=>{
     assert.strictEqual(preparedPhasesNoLinks[index].displayName, `${phaseName} ${index}`);
   })
   it("phase exists, name undefined, display name matches expected format",()=>{
-    const phase = PhaseController.Create(MockPhase, undefined, 0, maxDuration);
+    const phase = PhaseController.Create(undefined, 0, maxDuration);
     assert.strictEqual(phase.displayName, `${undefined} ${0}`);
   })
   it("phase exists, name null, display name matches expected format",()=>{
-    const phase = PhaseController.Create(MockPhase, null, 0, maxDuration);
+    const phase = PhaseController.Create(null, 0, maxDuration);
     assert.strictEqual(phase.displayName, `${null} ${0}`);
   })
 });
@@ -63,18 +59,18 @@ describe("PhaseController.displayName", ()=>{
 describe("PhaseController.durationInMs", ()=>{
   beforeEach(standardSetup);
   it("phase not started, returns -1", ()=>{
-    const phase = PhaseController.Create(MockPhase, phaseName, 0, maxDuration);
+    const phase = PhaseController.Create(phaseName, 0, maxDuration);
     assert.strictEqual(phase.durationInMs, -1);
   })
   it("phase started and not ended, returns difference from start to current time", ()=>{
-    const phase = PhaseController.Create(MockPhase, phaseName, 0, maxDuration);
+    const phase = PhaseController.Create(phaseName, 0, maxDuration);
     const start = phase.start();
     setTimeout(1000);
     const end = Date.now();  
     assert.strictEqual(phase.durationInMs, end - start);
   })
   it("phase started and ended (doesn't exceed max), returns difference from start to end time", ()=>{
-    const phase = PhaseController.Create(MockPhase, phaseName, 0, maxDuration);
+    const phase = PhaseController.Create(phaseName, 0, maxDuration);
     const start = phase.start();
     setTimeout(1000);  
     const end = phase.end();
@@ -82,7 +78,7 @@ describe("PhaseController.durationInMs", ()=>{
   })
   it("phase started and ended (does exceed max), returns (approx) max duration time", async ()=>{ 
     const maxDurationMs = 5000;
-    const phase = PhaseController.Create(MockPhase, phaseName, 0, maxDurationMs);
+    const phase = PhaseController.Create(phaseName, 0, maxDurationMs);
     phase.start();
     await setTimeout(maxDurationMs + 1000);  
     assert.strictEqual(phase.durationInMs >= maxDurationMs, true, "Duration is less than MaxDurationInMs !");
@@ -122,7 +118,7 @@ describe("PhaseController.setPreviousPhase()", ()=>{
     assert.notEqual(phase.previousPhase, null, "Phase not set up correctly - has no previous phase");
     assert.equal(phase.nextPhase, null, "Phase not set up correctly - has next phase!");
 
-    const previous = PhaseController.Create(MockPhase, phaseName, 999, maxDuration).phase;
+    const previous = PhaseController.Create(phaseName, 999, maxDuration).phase;
     phase.setPreviousPhase(previous);
     assert.strictEqual(phase.previousPhase, previous);
   })
@@ -158,7 +154,7 @@ describe("PhaseController.setPreviousPhase()", ()=>{
     assert.equal(phase.previousPhase, null, "Phase not set up correctly - has previous phase");
     assert.notEqual(phase.nextPhase, null, "Phase not set up correctly - has no next phase!");
 
-    const previous = PhaseController.Create(MockPhase, phaseName, 999, maxDuration).phase;
+    const previous = PhaseController.Create(phaseName, 999, maxDuration).phase;
     phase.setPreviousPhase(previous);
     assert.strictEqual(phase.previousPhase, previous);
   })
@@ -191,7 +187,7 @@ describe("PhaseController.setPreviousPhase()", ()=>{
     assert.notEqual(phase.previousPhase, null, "Phase not set up correctly - has no previous phase");
     assert.notEqual(phase.nextPhase, null, "Phase not set up correctly - has no next phase!");
 
-    const previous = PhaseController.Create(MockPhase, phaseName, 999, maxDuration).phase;
+    const previous = PhaseController.Create(phaseName, 999, maxDuration).phase;
     phase.setPreviousPhase(previous);
     assert.strictEqual(phase.previousPhase, previous);
   })
@@ -264,7 +260,7 @@ describe("PhaseController.setNextPhase()", ()=>{
     assert.notEqual(phase.previousPhase, null, "Phase not set up correctly - has no previous phase");
     assert.equal(phase.nextPhase, null, "Phase not set up correctly - has next phase!");
 
-    const next = PhaseController.Create(MockPhase, phaseName, 999, maxDuration).phase;
+    const next = PhaseController.Create(phaseName, 999, maxDuration).phase;
     phase.setNextPhase(next);
     assert.strictEqual(phase.nextPhase, next);
   })
@@ -297,7 +293,7 @@ describe("PhaseController.setNextPhase()", ()=>{
     assert.equal(phase.previousPhase, null, "Phase not set up correctly - has previous phase");
     assert.notEqual(phase.nextPhase, null, "Phase not set up correctly - has no next phase!");
 
-    const next = PhaseController.Create(MockPhase, phaseName, 999, maxDuration).phase;
+    const next = PhaseController.Create(phaseName, 999, maxDuration).phase;
     phase.setNextPhase(next);
     assert.strictEqual(phase.nextPhase, next);
   })
@@ -333,7 +329,7 @@ describe("PhaseController.setNextPhase()", ()=>{
     assert.notEqual(phase.previousPhase, null, "Phase not set up correctly - has no previous phase");
     assert.notEqual(phase.nextPhase, null, "Phase not set up correctly - has no next phase!");
 
-    const next = PhaseController.Create(MockPhase, phaseName, 999, maxDuration).phase;
+    const next = PhaseController.Create(phaseName, 999, maxDuration).phase;
     phase.setNextPhase(next);
     assert.strictEqual(phase.nextPhase, next);
   })
@@ -377,7 +373,7 @@ describe("PhaseController.setNextPhase()", ()=>{
 describe("PhaseController.start()", ()=>{
   beforeEach(standardSetup);
   it("phase not started, returns current time", ()=>{
-    const phase = PhaseController.Create(MockPhase, phaseName, 0, maxDuration);
+    const phase = PhaseController.Create(phaseName, 0, maxDuration);
     assert.strictEqual(phase.start(), Date.now());
   })
   it("phase started, returns -1", ()=>{
@@ -401,7 +397,7 @@ describe("PhaseController.end()", ()=>{
     assert.strictEqual(phase.end(), Date.now());
   })
   it("phase not started, returns -1", ()=>{
-    const phase = PhaseController.Create(MockPhase, phaseName, 0, maxDuration);
+    const phase = PhaseController.Create(phaseName, 0, maxDuration);
     assert.strictEqual(phase.end(), -1);    
   })
   it("phase ended, returns -1", ()=>{
@@ -421,7 +417,7 @@ describe("PhaseController.abandon()", ()=>{
     assert.strictEqual(phase.abandon(), Date.now());
   })
   it("phase not started, returns -1", ()=>{
-    const phase = PhaseController.Create(MockPhase, phaseName, 0, maxDuration);
+    const phase = PhaseController.Create(phaseName, 0, maxDuration);
     assert.strictEqual(phase.abandon(), -1);    
   })
   it("phase ended, returns -1", ()=>{

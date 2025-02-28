@@ -24,8 +24,8 @@ export default class PhaseController {
   constructor(readonly phase: Phase){}
 
   // instantiates a new phase controller with a phase of the specified subtype
-  static Create<T extends Phase>(p: new() => T, name: string, iteration: number, maxDurationInMs: number): PhaseController {
-    const phase = new p();
+  static Create(name: string, iteration: number, maxDurationInMs: number): PhaseController {
+    const phase = new Phase();
     // fill out details
     phase.name = name;
     phase.iteration = iteration;
