@@ -102,11 +102,11 @@ describe("GameController.end()", ()=>{
 
 describe("GameController.abandon()", ()=>{
   beforeEach(standardSetup);
-  it("game not started, current time", ()=>{
+  it("game not started, returns current time", ()=>{
     const game = GameController.Create(gameName, host);
     assert.strictEqual(game.abandon(), Date.now());
   })
-  it("game accepting signups, current time", ()=>{
+  it("game accepting signups, returns current time", ()=>{
     const game = signupsGame;
     assert.strictEqual(game.abandon(), Date.now());
   })

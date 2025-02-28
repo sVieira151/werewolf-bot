@@ -54,7 +54,7 @@ export default class GameController {
   // Returns -1 if game hasn't ended
   abandon(): number {
     const game = this.game;
-    if (game.currentStatus && game.currentStatus.name === DefaultGameStatusNames.ENDED && game.currentStatus.name === DefaultGameStatusNames.ABANDONED)
+    if (game.currentStatus && (game.currentStatus.name === DefaultGameStatusNames.ENDED || game.currentStatus.name === DefaultGameStatusNames.ABANDONED))
       return -1;
 
     // create the new status
